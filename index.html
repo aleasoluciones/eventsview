@@ -1,7 +1,7 @@
 <html>
 
 <body>
-Hello world!
+
 
 <div>
     <ul id="warningsul">
@@ -61,36 +61,44 @@ Hello world!
         return result;
     }
 
+    function renderNewEvents(events){
+        var eventsul = document.getElementById("eventsul");
+        for (var i=0; i< events.length; i++){
+          var liNode = document.createElement("LI");
+          liNode.id = events[i].timestamp;
+          var event = events[i];
+          
+          var aTag = document.createElement('a');
+          aTag.setAttribute("name", "#"+events[i].timestamp);
+          aTag.innerText = events[i].timestamp +  " " + events[i].message;
+          liNode.appendChild(aTag);
+          eventsul.appendChild(liNode);
+        }
+    }
 
-    var events = getEvents(100);
-    var warningevents = events.filter(function(e) { return e.warning == true})
+    function renderNewWarningEvents(warnings){
+        var warningsul = document.getElementById("warningsul");
+        for (var i=0; i< warnings.length; i++){
+          var liNode = document.createElement("LI");
+          var aTag = document.createElement('a');
+          aTag.setAttribute("href", "#"+events[i].timestamp);
+          aTag.innerText = events[i].timestamp;
+          var event = warnings[i];
+          liNode.appendChild(aTag);
+          liNode.appendChild(document.createTextNode(" " + warnings[i].message));
+          warningsul.appendChild(liNode);
+        }
+
+    }
     
+    
+    var events = getEvents(100);
+    renderNewEvents(events);
+
+    var warningevents = events.filter(function(e) { return e.warning == true})
+    renderNewWarningEvents(warningevents)
 
 
-    var warningsul = document.getElementById("warningsul");
-    for (var i=0; i< warningevents.length; i++){
-      var liNode = document.createElement("LI");
-      var aTag = document.createElement('a');
-      aTag.setAttribute("href", "#"+events[i].timestamp);
-      aTag.innerText = events[i].timestamp;
-      var event = warningevents[i];
-      liNode.appendChild(aTag);
-      liNode.appendChild(document.createTextNode(" " + warningevents[i].message));
-      warningsul.appendChild(liNode);
-    }
-
-    var eventsul = document.getElementById("eventsul");
-    for (var i=0; i< events.length; i++){
-      var liNode = document.createElement("LI");
-      liNode.id = events[i].timestamp;
-      var event = events[i];
-      
-      var aTag = document.createElement('a');
-      aTag.setAttribute("name", "#"+events[i].timestamp);
-      aTag.innerText = events[i].timestamp +  " " + events[i].message;
-      liNode.appendChild(aTag);
-      eventsul.appendChild(liNode);
-    }
 })();
 </script>
 
