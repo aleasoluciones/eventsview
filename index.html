@@ -1,0 +1,45 @@
+<html>
+
+<body>
+Hello world!
+
+<div id="viewer">
+</div>
+
+
+<script type="text/javascript">
+(function() {
+    function randomMessage() {
+      var messages= [
+        "Message1",
+        "Message2",
+        "Message3",
+        "Message4",
+        "Message5",
+      ];
+      var messageIndex = parseInt(Math.random() * 5)
+      return messages[messageIndex];
+    }
+    function getEvents() {
+        var now = new Date();
+        var result = [];
+        for (var i = 0; i < 100; i++) {
+                result.push({timestamp:now, message:"Test " + i});
+        }
+        return result;
+    }
+
+    var view = document.getElementById("viewer");
+    var events = getEvents();
+    var ulNode = document.createElement("UL");
+    view.appendChild(ulNode);
+    for (var i=0; i< events.length; i++){
+      var liNode = document.createElement("LI");
+      liNode.appendChild(document.createTextNode(events[i]));
+      ulNode.appendChild(liNode);
+    }
+})();
+</script>
+
+</body>
+</html>

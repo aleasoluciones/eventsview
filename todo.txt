@@ -1,0 +1,30 @@
+
+* events timestamp fields
+* server
+ * from timestamp to timestamp
+ * optional search/filter
+
+* viewer
+ * Important events repeated at the begining of the viewer
+ * scroll vertical (global for the page)
+ * show fields, show messages
+ * css for diferent tagss for events
+
+
+<a href="#sdfsd">
+
+<ul>
+<li class="warning"></li
+<li id="asdasd"></li>
+<li></li>
+<li></li>
+<ul>
+
+{id asdasd, message text, warning true,}
+
+
+
+last important event viewer (3)
+maineventviewer (200)
+
+
