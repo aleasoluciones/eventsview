@@ -9,22 +9,35 @@ Hello world!
 
 <script type="text/javascript">
 (function() {
-    function randomMessage() {
-      var messages= [
-        "Message1",
-        "Message2",
-        "Message3",
-        "Message4",
-        "Message5",
+    function randomEvent() {
+      var events = [
+          { message:"Error provision", warning:true},
+          { message:"Error al provisionar: Este modelo no soporta TV", warning:true},
+          { message:"Error al provisionar: número de líneas no soportado por el modelo", warning:true},
+          { message:"Cambio datos Telefonía"},
+          { message:"Cambio de servicio 30Megas, 1 Línea, IPTV a 60Megas, 1 Línea, IPTV"},
+          { message:"Cambio datos GPON"},
+          { message:"Línea 1: Registrada"},
+          { message:"Online alepregpon1 0/1/2/2"},
+          { message:"DHCP lease 192.168.105.164"},
+          { message:"Offline"},
+          { message:"Línea 1: Registrada"},
+          { message:"ACS OK Firmware upgrade"},
+          { message:"Línea 1: Registrada"},
+          { message:"ACS Firmware upgrade requested HG8247T_V200R006C00SPC201_full_all.bin"},
+          { message:"Línea 1: Registrada"},
+          { message:"ACS Boot"}
       ];
-      var messageIndex = parseInt(Math.random() * 5)
-      return messages[messageIndex];
+      var eventIndex = parseInt(Math.random() * events.length)
+      return events[eventIndex];
     }
     function getEvents() {
-        var now = new Date();
+        var now = new Date().getTime();
         var result = [];
         for (var i = 0; i < 100; i++) {
-                result.push({timestamp:now, message:"Test " + i});
+                var event = randomEvent();
+	        event.timestamp = now + i;
+                result.push(event);
         }
         return result;
     }
@@ -35,7 +48,9 @@ Hello world!
     view.appendChild(ulNode);
     for (var i=0; i< events.length; i++){
       var liNode = document.createElement("LI");
-      liNode.appendChild(document.createTextNode(events[i]));
+      liNode.id = events[i].timestamp;
+      var event = events[i];
+      liNode.appendChild(document.createTextNode(events[i].timestamp +  " " + events[i].message));
       ulNode.appendChild(liNode);
     }
 })();
