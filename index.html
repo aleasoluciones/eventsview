@@ -52,10 +52,12 @@
         for (var i = 0; i < numEvents; i++) {
                 if ( i % 25 == 0 ) {
                     var event = randomErrorEvent()
+                    event.message = i + " - " + event.message;
                 } else {
                     var event = randomEvent();
+                    event.message = i + " - " + event.message;
                 }
-	            event.timestamp = now - i;
+	            event.timestamp = now + i;
                 result.push(event);
         }
         return result;
@@ -64,40 +66,49 @@
     function renderNewEvents(events){
         var eventsul = document.getElementById("eventsul");
         for (var i=0; i< events.length; i++){
-          var liNode = document.createElement("LI");
-          liNode.id = events[i].timestamp;
-          var event = events[i];
-          
-          var aTag = document.createElement('a');
-          aTag.setAttribute("name", "#"+events[i].timestamp);
-          aTag.innerText = events[i].timestamp +  " " + events[i].message;
-          liNode.appendChild(aTag);
-          eventsul.appendChild(liNode);
+            var liNode = document.createElement("LI");
+            liNode.id = events[i].timestamp;
+            var event = events[i];
+              
+            var aTag = document.createElement('a');
+            aTag.setAttribute("name", "#"+events[i].timestamp);
+            aTag.innerText = events[i].timestamp +  " " + events[i].message;
+            liNode.appendChild(aTag);
+
+            eventsul.insertBefore(liNode,eventsul.firstChild);
         }
+
     }
 
     function renderNewWarningEvents(warnings){
         var warningsul = document.getElementById("warningsul");
         for (var i=0; i< warnings.length; i++){
-          var liNode = document.createElement("LI");
-          var aTag = document.createElement('a');
-          aTag.setAttribute("href", "#"+events[i].timestamp);
-          aTag.innerText = events[i].timestamp;
-          var event = warnings[i];
-          liNode.appendChild(aTag);
-          liNode.appendChild(document.createTextNode(" " + warnings[i].message));
-          warningsul.appendChild(liNode);
+            var liNode = document.createElement("LI");
+            var aTag = document.createElement('a');
+            aTag.setAttribute("href", "#"+warnings[i].timestamp);
+            aTag.innerText = warnings[i].timestamp;
+            var event = warnings[i];
+            liNode.appendChild(aTag);
+            liNode.appendChild(document.createTextNode(" " + warnings[i].message));
+            warningsul.insertBefore(liNode, warningsul.firstChild);
         }
 
     }
     
     
-    var events = getEvents(100);
+    var events = getEvents(10);
     renderNewEvents(events);
 
     var warningevents = events.filter(function(e) { return e.warning == true})
     renderNewWarningEvents(warningevents)
 
+
+    ticker = window.setInterval(function(){
+        var events = getEvents(10);
+        renderNewEvents(events);
+        var warningevents = events.filter(function(e) { return e.warning == true})
+        renderNewWarningEvents(warningevents)
+    }, 6000);
 
 })();
 </script>
