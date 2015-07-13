@@ -3,6 +3,9 @@
 <body>
 Hello world!
 
+<div id="warningview">
+</div>
+<hr>
 <div id="viewer">
 </div>
 
@@ -42,15 +45,36 @@ Hello world!
         return result;
     }
 
-    var view = document.getElementById("viewer");
+
     var events = getEvents();
+    var warningevents = events.filter(function(e) { return e.warning == true})
+    var warningview = document.getElementById("warningview");
+    var ulNode = document.createElement("UL");
+    warningview.appendChild(ulNode);
+    for (var i=0; i< warningevents.length; i++){
+      var liNode = document.createElement("LI");
+      var aTag = document.createElement('a');
+      aTag.setAttribute("href", "#"+events[i].timestamp);
+      aTag.innerText = events[i].timestamp;
+      var event = warningevents[i];
+      liNode.appendChild(aTag);
+      liNode.appendChild(document.createTextNode(" " + warningevents[i].message));
+      ulNode.appendChild(liNode);
+    }
+
+    var view = document.getElementById("viewer");
     var ulNode = document.createElement("UL");
     view.appendChild(ulNode);
     for (var i=0; i< events.length; i++){
+      console.log("EFA un evento", events[i]);
       var liNode = document.createElement("LI");
       liNode.id = events[i].timestamp;
       var event = events[i];
-      liNode.appendChild(document.createTextNode(events[i].timestamp +  " " + events[i].message));
+      
+      var aTag = document.createElement('a');
+      aTag.setAttribute("name", "#"+events[i].timestamp);
+      aTag.innerText = events[i].timestamp +  " " + events[i].message;
+      liNode.appendChild(aTag);
       ulNode.appendChild(liNode);
     }
 })();
