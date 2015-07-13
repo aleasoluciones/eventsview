@@ -3,20 +3,31 @@
 <body>
 Hello world!
 
-<div id="warningview">
+<div>
+    <ul id="warningsul">
+    </ul>
 </div>
 <hr>
-<div id="viewer">
+<div>
+    <ul id="eventsul">
+    </ul>
 </div>
 
 
 <script type="text/javascript">
 (function() {
-    function randomEvent() {
+    function randomErrorEvent() {
       var events = [
           { message:"Error provision", warning:true},
           { message:"Error al provisionar: Este modelo no soporta TV", warning:true},
           { message:"Error al provisionar: número de líneas no soportado por el modelo", warning:true},
+      ];
+      var eventIndex = parseInt(Math.random() * events.length)
+      return events[eventIndex];
+    }
+
+    function randomEvent() {
+      var events = [
           { message:"Cambio datos Telefonía"},
           { message:"Cambio de servicio 30Megas, 1 Línea, IPTV a 60Megas, 1 Línea, IPTV"},
           { message:"Cambio datos GPON"},
@@ -34,23 +45,29 @@ Hello world!
       var eventIndex = parseInt(Math.random() * events.length)
       return events[eventIndex];
     }
-    function getEvents() {
+
+    function getEvents(numEvents) {
         var now = new Date().getTime();
         var result = [];
-        for (var i = 0; i < 100; i++) {
-                var event = randomEvent();
-	        event.timestamp = now + i;
+        for (var i = 0; i < numEvents; i++) {
+                if ( i % 25 == 0 ) {
+                    var event = randomErrorEvent()
+                } else {
+                    var event = randomEvent();
+                }
+	            event.timestamp = now - i;
                 result.push(event);
         }
         return result;
     }
 
 
-    var events = getEvents();
+    var events = getEvents(100);
     var warningevents = events.filter(function(e) { return e.warning == true})
-    var warningview = document.getElementById("warningview");
-    var ulNode = document.createElement("UL");
-    warningview.appendChild(ulNode);
+    
+
+
+    var warningsul = document.getElementById("warningsul");
     for (var i=0; i< warningevents.length; i++){
       var liNode = document.createElement("LI");
       var aTag = document.createElement('a');
@@ -59,14 +76,11 @@ Hello world!
       var event = warningevents[i];
       liNode.appendChild(aTag);
       liNode.appendChild(document.createTextNode(" " + warningevents[i].message));
-      ulNode.appendChild(liNode);
+      warningsul.appendChild(liNode);
     }
 
-    var view = document.getElementById("viewer");
-    var ulNode = document.createElement("UL");
-    view.appendChild(ulNode);
+    var eventsul = document.getElementById("eventsul");
     for (var i=0; i< events.length; i++){
-      console.log("EFA un evento", events[i]);
       var liNode = document.createElement("LI");
       liNode.id = events[i].timestamp;
       var event = events[i];
@@ -75,7 +89,7 @@ Hello world!
       aTag.setAttribute("name", "#"+events[i].timestamp);
       aTag.innerText = events[i].timestamp +  " " + events[i].message;
       liNode.appendChild(aTag);
-      ulNode.appendChild(liNode);
+      eventsul.appendChild(liNode);
     }
 })();
 </script>
