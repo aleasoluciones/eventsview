@@ -3,10 +3,18 @@ var EVENTS = {};
 
 (function(ns){
   ns.createPresenter = function(eventsRepository, eventView, warningView) {
-    return {
-      render: function(){
+    var render = function () {
           eventView.render(eventsRepository.findAll());
           warningView.render(eventsRepository.findAllWarningEvents());
+    }
+
+    eventsRepository.onUpdate(function () {
+      render();
+    });
+
+    return {
+      displayEvents: function(){
+        render();
       },
     };
   };
@@ -62,7 +70,13 @@ var EVENTS = {};
 
     var events = getEvents(20);
     var warningEvents = events.filter(function(e) { return e.warning == true})
+    var onUpdateCallback = null;
 
+    setInterval(function(){
+        events = events.concat(getEvents(10));
+        warningEvents = events.filter(function(e) { return e.warning == true});
+        onUpdateCallback && onUpdateCallback();
+    }, 6000);
 
     return {
       findAll: function() {
@@ -70,6 +84,9 @@ var EVENTS = {};
       },
       findAllWarningEvents: function() {
         return warningEvents;
+      },
+      onUpdate: function(callback){
+        onUpdateCallback = callback;
       },
     };
   };
