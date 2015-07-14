@@ -2,6 +2,14 @@ var EVENTS = {};
 
 
 (function(ns){
+  ns.createPresenter = function(eventsRepository, eventView, warningView) {
+    return {
+      render: function(){
+          eventView.render(eventsRepository.findAll());
+          warningView.render(eventsRepository.findAllWarningEvents());
+      },
+    };
+  };
   ns.createRepository = function() {
 
     function randomErrorEvent() {

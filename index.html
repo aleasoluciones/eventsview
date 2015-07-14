@@ -50,10 +50,11 @@
     }
 
     var eventsRepo = EVENTS.createRepository();
-
-    renderNewEvents(eventsRepo.findAll());
-    renderNewWarningEvents(eventsRepo.findAllWarningEvents())
-
+    var eventsPresenter = EVENTS.createPresenter(
+        eventsRepo,
+        {render: renderNewEvents},
+        {render: renderNewWarningEvents});
+    eventsPresenter.render();
 
     //ticker = window.setInterval(function(){
     //    var events = getEvents(10);
