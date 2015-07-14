@@ -54,7 +54,7 @@ class EventsHandler(tornado.web.RequestHandler):
         else:
             nextId = 0
         events.extend(self.getNewEvents(50, nextId))
-        self.write(json.dumps(events))
+        self.write(json.dumps(events[-50:]))
 
 
 def to_timestamp(t):

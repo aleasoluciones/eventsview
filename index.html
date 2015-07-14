@@ -13,6 +13,9 @@
     </ul>
 </div>
 
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script type="text/javascript" src="./events.js"></script>
 <script type="text/javascript">
 (function() {
@@ -49,7 +52,7 @@
         }
     }
 
-    var eventsRepo = EVENTS.createRepository();
+    var eventsRepo = EVENTS.createAjaxRepository('/events');
     var eventsPresenter = EVENTS.createPresenter(
         eventsRepo,
         {render: renderNewEvents},
