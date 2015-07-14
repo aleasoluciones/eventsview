@@ -21,34 +21,28 @@
 (function() {
 
     function renderNewEvents(events){
-        var eventsul = document.getElementById("eventsul");
-        eventsul.innerHTML = '';
+        events.sort(function(e1, e2) { return e2.id - e1.id; });
+        var eventsul = $("#eventsul");
+        eventsul.empty();
+
         for (var i=0; i< events.length; i++){
-            var liNode = document.createElement("LI");
-            liNode.id = events[i].timestamp;
-            var event = events[i];
-
-            var aTag = document.createElement('a');
-            aTag.setAttribute("name", "#"+events[i].timestamp);
-            aTag.innerText = events[i].timestamp +  " " + events[i].message;
-            liNode.appendChild(aTag);
-
-            eventsul.insertBefore(liNode,eventsul.firstChild);
+            var liNode = $('<li>', {id: events[i].id});
+            liNode.text(events[i].id + " " + events[i].timestamp +  " " + events[i].message);
+            eventsul.append(liNode);
         }
     }
 
     function renderNewWarningEvents(warnings){
-        var warningsul = document.getElementById("warningsul");
-        warningsul.innerHTML = '';
+        warnings.sort(function(e1, e2) { return e2.id - e1.id; });
+        var warningsul = $("#warningsul");
+        warningsul.empty();
+
         for (var i=0; i< warnings.length; i++){
-            var liNode = document.createElement("LI");
-            var aTag = document.createElement('a');
-            aTag.setAttribute("href", "#"+warnings[i].timestamp);
-            aTag.innerText = warnings[i].timestamp;
-            var event = warnings[i];
-            liNode.appendChild(aTag);
-            liNode.appendChild(document.createTextNode(" " + warnings[i].message));
-            warningsul.insertBefore(liNode, warningsul.firstChild);
+            var liNode = $('<li>');
+            var href = $('<a>', {href: "#"+warnings[i].id});
+            href.text(warnings[i].id + " " + warnings[i].message);
+            liNode.append(href);
+            warningsul.append(liNode);
         }
     }
 
