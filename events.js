@@ -2,13 +2,19 @@ var EVENTS = {};
 
 
 (function(ns){
-  ns.createPresenter = function(eventsRepository, eventView, warningView) {
+  ns.createPresenter = function(eventsService, eventsView, warningsView, filtersView) {
+    var filters = {};
     var render = function () {
-          eventView.render(eventsRepository.findAll());
-          warningView.render(eventsRepository.findAllWarningEvents());
+          eventsView.render(eventsService.findAll());
+          warningsView.render(eventsService.findAllWarningEvents());
+          filtersView.render(filters, eventsService.availableFilters(), function (property, selected) {
+            filters[property] = selected;
+            console.log("CALLBACK FILTERSVIEW", filters);
+            //debugger;
+          });
     }
 
-    eventsRepository.onUpdate(function () {
+    eventsService.onUpdate(function () {
       render();
     });
 
@@ -18,46 +24,66 @@ var EVENTS = {};
       },
     };
   };
-  ns.createAjaxRepository = function(url) {
+
+
+  ns.createEventsService = function(url) {
     var events = [];
     var warningEvents = [];
-    var fields = {};
+    var availableFields = {};
 
     var onUpdateCallback = null;
 
-    setInterval(function(){
-        $.get(url, {}, function(data){
+    function updateAvailableFields() {
+      fields = {};
+      for (i=0; i< events.length; i++){
+        for (var property in events[i]) {
+          if (property === "message" || property === "id" || property === "timestamp" || property === "warning")
+            continue;
+          if (! fields[property]) {
+            fields[property] = [];
+          }
+          if ( fields[property].indexOf(events[i][property]) == -1 ) {
+            fields[property].push(events[i][property]);
+          }
+        }
+      }
+      availableFields = fields;
+    };
+
+    function filter(events, filters) {
+      filters = filters || {};
+      var result = events.filter(function(e){
+        for (var filter_property in filters) {
+          if (e[filter_property] !== filters[filter_property]) {
+            return false;
+          }
+        }
+        return true;
+      });
+      return result;
+    };
+
+    function updateDataFromServer(){
+      $.get(url, {}, function(data){
           events = JSON.parse(data);
           warningEvents = events.filter(function(e){ return e.warning == true});
-
-          fields = {};
-          for (i=0; i< events.length; i++){
-            for (var property in events[i]) {
-
-              if (property === "message" || property === "id" || property === "timestamp")
-                continue;
-
-              if (! fields[property]) {
-                fields[property] = [];
-              }
-
-              if ( fields[property].indexOf(events[i][property]) == -1 ) {
-                 fields[property].push(events[i][property]);
-              }
-            }
-          }
-          console.log("EFA", fields);
-
+          updateAvailableFields();
           onUpdateCallback && onUpdateCallback();
         });
-    }, 2000);
+    };
+
+    updateDataFromServer();
+    setInterval(updateDataFromServer, 20000);
 
     return {
-      findAll: function() {
-        return events;
+      availableFilters: function() {
+        return availableFields;
       },
-      findAllWarningEvents: function() {
-        return warningEvents;
+      findAll: function(filters) {
+        return filter(events, filters);
+      },
+      findAllWarningEvents: function(filters) {
+        return filter(warningEvents, filters);
       },
       onUpdate: function(callback){
         onUpdateCallback = callback;
