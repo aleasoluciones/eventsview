@@ -7,13 +7,11 @@ var EVENTS = {};
     var filters = {};
 
     filtersView.onFilterSelected(function (property, selected) {
-      console.log("onFilterSelected", property, selected);
       filters[property] = selected;
       renderEvents();
     });
 
     filtersView.onFilterDeleted(function (property) {
-      console.log("onFilterDeleted", property);
       delete filters[property];
       renderEvents();
     });
@@ -40,7 +38,7 @@ var EVENTS = {};
   };
 
 
-  ns.createEventsService = function(url) {
+  ns.createEventsService = function(url, fieldNames) {
     var events = [];
     var warningEvents = [];
     var availableFields = {};
@@ -48,16 +46,20 @@ var EVENTS = {};
     var onUpdateCallback = null;
 
     function updateAvailableFields() {
-      fields = {};
-      for (i=0; i< events.length; i++){
-        for (var property in events[i]) {
-          if (property === "message" || property === "id" || property === "timestamp" || property === "warning")
-            continue;
-          if (! fields[property]) {
-            fields[property] = [];
+      var fields = {};
+      for (var i=0; i< events.length; i++){
+        for (var fieldIndex=0; fieldIndex < fieldNames.length; fieldIndex++){
+          var field = fieldNames[fieldIndex];
+          var event_field_value = events[i][field];
+
+          if (! fields[field]) {
+            fields[field] = [];
           }
-          if ( fields[property].indexOf(events[i][property]) == -1 ) {
-            fields[property].push(events[i][property]);
+
+          if (event_field_value) {
+            if ( fields[field].indexOf(event_field_value) == -1 ) {
+                fields[field].push(event_field_value);
+            }
           }
         }
       }
@@ -141,10 +143,18 @@ var EVENTS = {};
     var onFilterDeletedCallback;
     var onFilterSelectedCallback;
 
+
+    var previousAvailableFilters = {};
+
     return {
       onFilterDeleted: function(callback){ onFilterDeletedCallback = callback; },
       onFilterSelected: function(callback){ onFilterSelectedCallback = callback; },
       render: function (filters, availableFilters){
+        if (JSON.stringify(availableFilters) === JSON.stringify(previousAvailableFilters)) {
+          return;
+        }
+        previousAvailableFilters = availableFilters;
+
         filtersform.empty();
 
         filters = filters || {};
