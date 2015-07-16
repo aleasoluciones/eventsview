@@ -91,7 +91,7 @@ var EVENTS = {};
 
     return {
       availableFilters: function(filters) {
-        return updateAvailableFields(filter(events, filters));
+        return updateAvailableFields(events);
       },
       findAll: function(filters) {
         return filter(events, filters);
@@ -183,14 +183,6 @@ var EVENTS = {};
             });
             filtersform.append(label);
             filtersform.append(select);
-            var removeFilter = $('<a>', {href: '#', data_property: property});
-            removeFilter.click(function(e){
-              var property = $(e.target).attr("data_property");
-              onFilterDeletedCallback && onFilterDeletedCallback(property);
-            });
-            removeFilter.css( {"margin-left":"5px"});
-            removeFilter.text('X');
-            filtersform.append(removeFilter);
         }
       }
     }

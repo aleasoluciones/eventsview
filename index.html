@@ -26,7 +26,7 @@
     var eventsPresenter = EVENTS.createPresenter(
         eventsService,
         EVENTS.createEventsView($("#eventsul")),
-        EVENTS.createWarningsView($("#warningsul")),
+        {render: function(){}}, //EVENTS.createWarningsView($("#warningsul")),
         EVENTS.createFiltersView($("#filtersform")))
 
     eventsPresenter.displayEvents();
