@@ -2,9 +2,15 @@ var EVENTS = {};
 
 
 (function(ns){
-  ns.createPresenter = function(eventsService, eventsView, warningsView, filtersView) {
+  ns.createPresenter = function(eventsService, eventsView, warningsView, filtersView, searchView) {
 
     var filters = {};
+    var searchText = "";
+
+    searchView.onSearchText(function (text) {
+      searchText = text;
+      render();
+    });
 
     filtersView.onFilterSelected(function (property, selected) {
       filters[property] = selected;
@@ -17,8 +23,8 @@ var EVENTS = {};
     });
 
     function renderEvents(){
-      eventsView.render(eventsService.findAll(filters));
-      warningsView.render(eventsService.findAllWarningEvents(filters));
+      eventsView.render(eventsService.findAll(filters, searchText));
+      warningsView.render(eventsService.findAllWarningEvents(filters, searchText));
     }
 
     function render() {
@@ -65,7 +71,7 @@ var EVENTS = {};
       return fields;
     };
 
-    function filter(events, filters) {
+    function filter(events, filters, searchText) {
       filters = filters || {};
       var result = events.filter(function(e){
         for (var filter_property in filters) {
@@ -73,6 +79,14 @@ var EVENTS = {};
             return false;
           }
         }
+
+        if (searchText){
+          if (e.message.indexOf(searchText) == -1) {
+            return false;
+          }
+          return true;
+        }
+
         return true;
       });
       return result;
@@ -93,11 +107,11 @@ var EVENTS = {};
       availableFilters: function(filters) {
         return updateAvailableFields(events);
       },
-      findAll: function(filters) {
-        return filter(events, filters);
+      findAll: function(filters, searchText) {
+        return filter(events, filters, searchText);
       },
-      findAllWarningEvents: function(filters) {
-        return filter(warningEvents, filters);
+      findAllWarningEvents: function(filters, searchText) {
+        return filter(warningEvents, filters, searchText);
       },
       onUpdate: function(callback){
         onUpdateCallback = callback;
@@ -137,11 +151,32 @@ var EVENTS = {};
     }
   }
 
+  ns.createSearchView = function (searchform){
+
+    var onSearchTextCallback;
+
+    var label = $('<label/>', {for: 'search'});
+    label.text("search");
+    label.css( {"margin-left":"10px", "margin-right":"5px", "width":"50px"});
+    searchform.append(label);
+
+    var inputText = $('<input>', {id: 'search'});
+    searchform.submit(function (e) {
+      e.preventDefault();
+      onSearchTextCallback && onSearchTextCallback(inputText.val());
+    });
+    searchform.append(inputText);
+
+    return {
+      onSearchText: function(callback){
+        onSearchTextCallback = callback;
+      }
+    }
+  }
+
   ns.createFiltersView = function (filtersform) {
     var onFilterDeletedCallback;
     var onFilterSelectedCallback;
-
-
     var previousAvailableFilters = {};
 
     return {

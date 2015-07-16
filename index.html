@@ -2,6 +2,8 @@
 
 <body>
 <div>
+    <form id="searchform">
+    </form>
     <form id="filtersform">
     </form>
 </div>
@@ -27,7 +29,8 @@
         eventsService,
         EVENTS.createEventsView($("#eventsul")),
         {render: function(){}}, //EVENTS.createWarningsView($("#warningsul")),
-        EVENTS.createFiltersView($("#filtersform")))
+        EVENTS.createFiltersView($("#filtersform")),
+        EVENTS.createSearchView($("#searchform")))
 
     eventsPresenter.displayEvents();
 })();
