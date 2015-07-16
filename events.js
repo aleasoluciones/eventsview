@@ -87,7 +87,7 @@ var EVENTS = {};
     };
 
     updateDataFromServer();
-    setInterval(updateDataFromServer, 20000);
+    setInterval(updateDataFromServer, 2000);
 
     return {
       availableFilters: function() {
@@ -156,7 +156,12 @@ var EVENTS = {};
             var select = $('<select/>', {id: property});
             select.append('<option value="*">*</option>');
             for (i=0; i< availableFilters[property].length; i++){
-                select.append('<option value="' + availableFilters[property][i] + '">' + availableFilters[property][i] + '</option>');
+                var option = $('<option>', {value: availableFilters[property][i]});
+                option.text(availableFilters[property][i]);
+                if (filters[property] === availableFilters[property][i]) {
+                  option.attr('selected', 'selected');
+                }
+                select.append(option);
             }
             select.change(function(e){
                 property = $(e.target).attr('id');
