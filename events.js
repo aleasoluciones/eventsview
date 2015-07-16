@@ -158,13 +158,11 @@ var EVENTS = {};
         filters = filters || {};
         availableFilters = availableFilters || {};
         for (var property in availableFilters) {
-            if ( availableFilters[property].length === 0 ) {
-              continue;
-            }
             var label = $('<label/>', {for: property});
             label.text(property);
-            label.css( {"margin-left":"10px", "margin-right":"5px"});
+            label.css( {"margin-left":"10px", "margin-right":"5px", "width":"50px"});
             var select = $('<select/>', {id: property});
+            select.css( {"width":"100px"} );
             select.append('<option value="*">*</option>');
             for (i=0; i< availableFilters[property].length; i++){
                 var option = $('<option>', {value: availableFilters[property][i]});
@@ -185,6 +183,14 @@ var EVENTS = {};
             });
             filtersform.append(label);
             filtersform.append(select);
+            var removeFilter = $('<a>', {href: '#', data_property: property});
+            removeFilter.click(function(e){
+              var property = $(e.target).attr("data_property");
+              onFilterDeletedCallback && onFilterDeletedCallback(property);
+            });
+            removeFilter.css( {"margin-left":"5px"});
+            removeFilter.text('X');
+            filtersform.append(removeFilter);
         }
       }
     }
