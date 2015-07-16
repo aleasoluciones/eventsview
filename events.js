@@ -3,15 +3,21 @@ var EVENTS = {};
 
 (function(ns){
   ns.createPresenter = function(eventsService, eventsView, warningsView, filtersView) {
+
+    function renderEvents(){
+      eventsView.render(eventsService.findAll(filters));
+      warningsView.render(eventsService.findAllWarningEvents(filters));
+    }
+
     var filters = {};
     var render = function () {
-          eventsView.render(eventsService.findAll());
-          warningsView.render(eventsService.findAllWarningEvents());
-          filtersView.render(filters, eventsService.availableFilters(), function (property, selected) {
-            filters[property] = selected;
-            console.log("CALLBACK FILTERSVIEW", filters);
-            //debugger;
-          });
+          renderEvents();
+          filtersView.render(filters, eventsService.availableFilters(),
+            function (property, selected) {
+                filters[property] = selected;
+                console.log("CALLBACK FILTERSVIEW", filters);
+                renderEvents();
+            });
     }
 
     eventsService.onUpdate(function () {
@@ -90,6 +96,66 @@ var EVENTS = {};
       },
     };
   };
+
+  ns.createEventsView = function (eventsul ) {
+    return {
+      render: function (events){
+        events.sort(function(e1, e2) { return e2.id - e1.id; });
+        eventsul.empty();
+
+        for (var i=0; i< events.length; i++){
+            var liNode = $('<li>', {id: events[i].id});
+            liNode.text(events[i].id + " " + events[i].timestamp +  " " + events[i].message);
+            eventsul.append(liNode);
+        }
+      }
+    }
+  }
+
+  ns.createWarningsView = function (warningsul) {
+    return {
+      render: function (warnings){
+        warnings.sort(function(e1, e2) { return e2.id - e1.id; });
+        warningsul.empty();
+
+        for (var i=0; i< warnings.length; i++){
+            var liNode = $('<li>');
+            var href = $('<a>', {href: "#"+warnings[i].id});
+            href.text(warnings[i].id + " " + warnings[i].message);
+            liNode.append(href);
+            warningsul.append(liNode);
+        }
+      }
+    }
+  }
+
+  ns.createFiltersView = function (filtersform) {
+    return {
+      render: function (filters, availableFilters, selectsHandler){
+        filtersform.empty();
+
+        filters = filters || {};
+        availableFilters = availableFilters || {};
+        for (var property in availableFilters) {
+            var label = $('<label/>', {for: property});
+            label.text(property);
+            label.css( {"margin-left":"10px", "margin-right":"5px"});
+            var select = $('<select/>', {id: property, selected: "NA"});
+            for (i=0; i< availableFilters[property].length; i++){
+                select.append('<option value="' + availableFilters[property][i] + '">' + availableFilters[property][i] + '</option>');
+            }
+            select.append('<option value="NA">*</option>');
+            select.change(function(e){
+                property = $(e.target).attr('id');
+                selected = $(e.target).val();
+                selectsHandler(property, selected);
+            });
+            filtersform.append(label);
+            filtersform.append(select);
+        }
+      }
+    }
+  }
 }(EVENTS));
 
 
