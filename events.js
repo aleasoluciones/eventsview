@@ -8,12 +8,12 @@ var EVENTS = {};
 
     filtersView.onFilterSelected(function (property, selected) {
       filters[property] = selected;
-      renderEvents();
+      render();
     });
 
     filtersView.onFilterDeleted(function (property) {
       delete filters[property];
-      renderEvents();
+      render();
     });
 
     function renderEvents(){
@@ -23,7 +23,7 @@ var EVENTS = {};
 
     function render() {
           renderEvents();
-          filtersView.render(filters, eventsService.availableFilters());
+          filtersView.render(filters, eventsService.availableFilters(filters));
     }
 
     eventsService.onUpdate(function () {
@@ -41,11 +41,10 @@ var EVENTS = {};
   ns.createEventsService = function(url, fieldNames) {
     var events = [];
     var warningEvents = [];
-    var availableFields = {};
 
     var onUpdateCallback = null;
 
-    function updateAvailableFields() {
+    function updateAvailableFields(events) {
       var fields = {};
       for (var i=0; i< events.length; i++){
         for (var fieldIndex=0; fieldIndex < fieldNames.length; fieldIndex++){
@@ -63,7 +62,7 @@ var EVENTS = {};
           }
         }
       }
-      availableFields = fields;
+      return fields;
     };
 
     function filter(events, filters) {
@@ -83,17 +82,16 @@ var EVENTS = {};
       $.get(url, {}, function(data){
           events = JSON.parse(data);
           warningEvents = events.filter(function(e){ return e.warning == true});
-          updateAvailableFields();
           onUpdateCallback && onUpdateCallback();
         });
     };
 
     updateDataFromServer();
-    setInterval(updateDataFromServer, 2000);
+    setInterval(updateDataFromServer, 5000);
 
     return {
-      availableFilters: function() {
-        return availableFields;
+      availableFilters: function(filters) {
+        return updateAvailableFields(filter(events, filters));
       },
       findAll: function(filters) {
         return filter(events, filters);
@@ -160,6 +158,9 @@ var EVENTS = {};
         filters = filters || {};
         availableFilters = availableFilters || {};
         for (var property in availableFilters) {
+            if ( availableFilters[property].length === 0 ) {
+              continue;
+            }
             var label = $('<label/>', {for: property});
             label.text(property);
             label.css( {"margin-left":"10px", "margin-right":"5px"});

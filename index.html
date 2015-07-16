@@ -22,7 +22,7 @@
 <script type="text/javascript" src="./events.js"></script>
 <script type="text/javascript">
 (function() {
-    var eventsService = EVENTS.createEventsService('/events', ['application', 'dhcp_action', 'contract']);
+    var eventsService = EVENTS.createEventsService('/events', ['application', 'dhcp_action', 'contract', 'num_serie']);
     var eventsPresenter = EVENTS.createPresenter(
         eventsService,
         EVENTS.createEventsView($("#eventsul")),
