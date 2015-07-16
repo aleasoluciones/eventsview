@@ -4,20 +4,28 @@ var EVENTS = {};
 (function(ns){
   ns.createPresenter = function(eventsService, eventsView, warningsView, filtersView) {
 
+    var filters = {};
+
+    filtersView.onFilterSelected(function (property, selected) {
+      console.log("onFilterSelected", property, selected);
+      filters[property] = selected;
+      renderEvents();
+    });
+
+    filtersView.onFilterDeleted(function (property) {
+      console.log("onFilterDeleted", property);
+      delete filters[property];
+      renderEvents();
+    });
+
     function renderEvents(){
       eventsView.render(eventsService.findAll(filters));
       warningsView.render(eventsService.findAllWarningEvents(filters));
     }
 
-    var filters = {};
-    var render = function () {
+    function render() {
           renderEvents();
-          filtersView.render(filters, eventsService.availableFilters(),
-            function (property, selected) {
-                filters[property] = selected;
-                console.log("CALLBACK FILTERSVIEW", filters);
-                renderEvents();
-            });
+          filtersView.render(filters, eventsService.availableFilters());
     }
 
     eventsService.onUpdate(function () {
@@ -130,8 +138,13 @@ var EVENTS = {};
   }
 
   ns.createFiltersView = function (filtersform) {
+    var onFilterDeletedCallback;
+    var onFilterSelectedCallback;
+
     return {
-      render: function (filters, availableFilters, selectsHandler){
+      onFilterDeleted: function(callback){ onFilterDeletedCallback = callback; },
+      onFilterSelected: function(callback){ onFilterSelectedCallback = callback; },
+      render: function (filters, availableFilters){
         filtersform.empty();
 
         filters = filters || {};
@@ -140,15 +153,19 @@ var EVENTS = {};
             var label = $('<label/>', {for: property});
             label.text(property);
             label.css( {"margin-left":"10px", "margin-right":"5px"});
-            var select = $('<select/>', {id: property, selected: "NA"});
+            var select = $('<select/>', {id: property});
+            select.append('<option value="*">*</option>');
             for (i=0; i< availableFilters[property].length; i++){
                 select.append('<option value="' + availableFilters[property][i] + '">' + availableFilters[property][i] + '</option>');
             }
-            select.append('<option value="NA">*</option>');
             select.change(function(e){
                 property = $(e.target).attr('id');
                 selected = $(e.target).val();
-                selectsHandler(property, selected);
+                if( selected === "*" ) {
+                  onFilterDeletedCallback && onFilterDeletedCallback(property);
+                } else {
+                  onFilterSelectedCallback && onFilterSelectedCallback(property, selected);
+                }
             });
             filtersform.append(label);
             filtersform.append(select);
